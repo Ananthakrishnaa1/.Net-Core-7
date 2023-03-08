@@ -4,9 +4,9 @@ public class WeatherForecast
 {
     public DateOnly Date { get; set; }
 
-    public string? Location { get; set; }
+    public string Location { get; set; } = string.Empty;
 
-    public int TemperatureC { get; set; }
+    public double TemperatureC { get; set; }
 
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 

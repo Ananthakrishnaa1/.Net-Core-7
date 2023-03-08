@@ -1,6 +1,7 @@
 ﻿using Main.Service.Models;
 using Main.Service.Utility;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace Main.Service.Services
@@ -43,15 +44,14 @@ namespace Main.Service.Services
                 using HttpResponseMessage response = await client.GetAsync(apiURL);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
-                var result = JsonConvert.DeserializeObject(responseBody);
+                var result = JsonConvert.DeserializeObject<JToken>(responseBody);
+                var interResult = new FetchResult<KeyValuePair<string, JToken>>(result);
                 weather = new WeatherForecast
                 {
                     Date = DateOnly.FromDateTime(DateTime.Now),
-                    TemperatureC = Random.Shared.Next(-20, 55),
-                    Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-                    Location = Locations[Random.Shared.Next(Summaries.Length)]
+                    TemperatureC = (double)((JValue)interResult.result["current"]["temp_c"]).Value,
+                    Summary = ((JValue)interResult.result["current"]["condition"]["text"]).Value as string,
+                    Location = ((JValue)interResult.result["location"]["name"]).Value as string
                 };
                 
             }
