@@ -1,10 +1,12 @@
 using Main.Service.Models;
 using Main.Service.RabbitMQ;
 using Main.Service.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Service.Controllers;
-
+[Authorize]
+//[AllowAnonymous]
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase

@@ -16,7 +16,12 @@ namespace Main.Service.Services
     {
         "London", "Paris", "New York", "Texas", "Tokio", "Hong Kong", "Singapore", "Colambo", "New Delhi", "Bengaluru"
     };
-        static readonly HttpClient client = new HttpClient();
+        private readonly HttpClient _httpClient;
+
+        public WeatherService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
 
         public async Task<IEnumerable<WeatherForecast>> GetWeatherAsync()
         {
@@ -41,28 +46,34 @@ namespace Main.Service.Services
             {
                 var apiURL = StaticConfigurationManager.AppSetting["weatherApi:weatherApiURL"] + StaticConfigurationManager.AppSetting["weatherApi:weatherApiKey"]
                     + "&q=" + location;
-                using HttpResponseMessage response = await client.GetAsync(apiURL);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<JToken>(responseBody);
-                var interResult = new FetchResult<KeyValuePair<string, JToken>>(result);
-                weather = new WeatherForecast
-                {
-                    Date = DateOnly.FromDateTime(DateTime.Now),
-                    TemperatureC = (double)((JValue)interResult.result["current"]["temp_c"]).Value,
-                    Summary = ((JValue)interResult.result["current"]["condition"]["text"]).Value as string,
-                    Location = ((JValue)interResult.result["location"]["name"]).Value as string
-                };
-                
+
+                weather = await GetWeatherData(apiURL);
             }
             catch (HttpRequestException e)
             {
                 Console.WriteLine("\nException Caught!");
                 Console.WriteLine("Message :{0} ", e.Message);
             }
-
            
             return await Task.FromResult(weather);
+        }
+
+        public async Task<WeatherForecast> GetWeatherData(string apiURL)
+        {
+            WeatherForecast weather = new WeatherForecast();
+            using HttpResponseMessage response = await _httpClient.GetAsync(apiURL);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<JToken>(responseBody);
+            var interResult = new FetchResult<KeyValuePair<string, JToken>>(result);
+            weather = new WeatherForecast
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                TemperatureC = (double)((JValue)interResult.result["current"]["temp_c"]).Value,
+                Summary = ((JValue)interResult.result["current"]["condition"]["text"]).Value as string,
+                Location = ((JValue)interResult.result["location"]["name"]).Value as string
+            };
+            return weather;
         }
     }
 }
