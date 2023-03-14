@@ -8,7 +8,7 @@ namespace Main.Service.Auth0.Contract
         String Client_Id { get; }
         String Connection { get; }
         public Task<SignupUserResponse> SignUpAsync(SignupUserRequest SignupUserRequest, CancellationToken cancellationToken = default);
-        public Task<SignInResponse> SignInAsync(SignInRequest signInRequest);
+        public Task<SignInResponse> SignInAsync(SignInUserRequest signInUserRequest, CancellationToken cancellationToken = default);
         public void SignOutAsync();
     }
 }

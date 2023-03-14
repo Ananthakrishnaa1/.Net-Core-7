@@ -31,21 +31,21 @@ namespace Main.Service.Auth0.Controller
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="signInRequest"></param>
+        /// <param name="signInUserRequest"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("SignIn")]
-        public Task<ActionResult> SignIn(SignInRequest signInRequest)
+        public async Task<ActionResult> SignIn(SignInUserRequest signInUserRequest)
         {
-            var response = _authService.SignInAsync(signInRequest);
-            return Task.FromResult<ActionResult>(Ok(response));
+            var response = await _authService.SignInAsync(signInUserRequest);
+            return Ok(response);
         }
 
         [HttpPost]
         [Route("SignOut")]
-        public Task<ActionResult> SignOut(SignInRequest signInRequest)
+        public Task<ActionResult> SignOut(SignInUserRequest signInUserRequest)
         {
-            _authService.SignInAsync(signInRequest);
+            _authService.SignOutAsync();
             return Task.FromResult<ActionResult>(Ok());
         }
 
