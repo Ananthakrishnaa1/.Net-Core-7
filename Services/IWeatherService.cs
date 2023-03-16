@@ -6,5 +6,6 @@ namespace Main.Service.Services
     {
         public Task<IEnumerable<WeatherForecast>> GetWeatherAsync();
         Task<WeatherForecast> GetWeatherOnLocation(string location);
+        public Task<WeatherForecast> GetWeatherData(string apiURL);
     }
 }
