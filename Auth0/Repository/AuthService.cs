@@ -3,6 +3,7 @@ using Main.Service.Auth0.Contract;
 using Main.Service.Auth0.Model;
 using Main.Service.Utility;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using System.Net.Mime;
@@ -24,13 +25,14 @@ namespace Main.Service.Auth0.Repository
         public String? _Scope { get; private set; }
         public String? _SecretId { get; private set; }
 
+        UserMaintenanceRequestBase _maintenanceRequest = new UserMaintenanceRequestBase();
 
 
         public AuthService(IAuthenticationConnection connections, HttpClient httpClient)
         {
             BaseUri = new System.Uri(StaticConfigurationManager.AppSetting["Authentication:Domain"]);
-            Client_Id = StaticConfigurationManager.AppSetting["Authentication:ClientId"];
-            Connection = StaticConfigurationManager.AppSetting["Authentication:DataBase"];
+            _maintenanceRequest.ClientId = StaticConfigurationManager.AppSetting["Authentication:ClientId"];
+            _maintenanceRequest.Connection = StaticConfigurationManager.AppSetting["Authentication:DataBase"];
             _Scope = "read";
             _Audience = StaticConfigurationManager.AppSetting["Authentication:Audience"];
             _SecretId = StaticConfigurationManager.AppSetting["Authentication:SecretId"];
@@ -60,9 +62,9 @@ namespace Main.Service.Auth0.Repository
                 Audience = _Audience,
                 Scope = _Scope,
                 ClientSecretId = _SecretId,
-                ClientId = Client_Id,
+                ClientId = _maintenanceRequest.ClientId,
                 GrantType = "http://auth0.com/oauth/grant-type/password-realm",
-                Realm = Connection
+                Realm = _maintenanceRequest.Connection,
             };
         }
 
@@ -78,8 +80,8 @@ namespace Main.Service.Auth0.Repository
                 if (signUpRequest == null)
                     throw new ArgumentNullException(nameof(signUpRequest));
 
-                signUpRequest.ClientId = Client_Id;
-                signUpRequest.Connection = Connection;
+                signUpRequest.ClientId = _maintenanceRequest.ClientId;
+                signUpRequest.Connection = _maintenanceRequest.Connection;
 
                 return await _connections.SendAsync<SignupUserResponse>(
                  HttpMethod.Post,
@@ -96,6 +98,21 @@ namespace Main.Service.Auth0.Repository
         private Uri BuildUri(string path)
         {
             return Utils.BuildUri(BaseUri.AbsoluteUri, path, null, null);
+        }
+
+        public async Task<string> ChangePasswordAsync(String EmailId, CancellationToken cancellationToken = default)
+        {
+            if (EmailId.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(EmailId));
+
+            UserMaintenanceRequestBase userMaintenanceRequestBase = _maintenanceRequest;
+            userMaintenanceRequestBase.Email = EmailId;
+
+            return await _connections.SendAsync<String>(
+             HttpMethod.Post,
+             BuildUri("dbconnections/change_password"),
+             userMaintenanceRequestBase,
+             cancellationToken: cancellationToken);
         }
     }
 }

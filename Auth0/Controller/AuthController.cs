@@ -49,5 +49,18 @@ namespace Main.Service.Auth0.Controller
             return Task.FromResult<ActionResult>(Ok());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="EmailId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ChangePassword")]
+        public async Task<ActionResult> ChangePassword(String EmailId)
+        {
+            var response = await _authService.ChangePasswordAsync(EmailId);
+            return Ok(response);
+        }
+
     }
 }

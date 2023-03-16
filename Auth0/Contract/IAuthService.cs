@@ -10,5 +10,6 @@ namespace Main.Service.Auth0.Contract
         public Task<SignupUserResponse> SignUpAsync(SignupUserRequest SignupUserRequest, CancellationToken cancellationToken = default);
         public Task<SignInResponse> SignInAsync(SignInUserRequest signInUserRequest, CancellationToken cancellationToken = default);
         public void SignOutAsync();
+        public Task<string> ChangePasswordAsync(String EmailId, CancellationToken cancellationToken = default);
     }
 }
