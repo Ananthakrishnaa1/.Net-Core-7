@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Service.Controllers;
-[Authorize]
-//[AllowAnonymous]
+
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
@@ -24,6 +23,7 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
+    [Authorize]
     public Task<IEnumerable<WeatherForecast>> Get()
     {
         var weatherForcastList = _weatherService.GetWeatherAsync();
@@ -32,6 +32,7 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpGet("{location}", Name= "GetWeatherForecastForLocation")]
+    [Authorize]
     public Task<WeatherForecast> GetWeatherForecastForLocation(string location)
     {
         var weatherForcastList = _weatherService.GetWeatherOnLocation(location);

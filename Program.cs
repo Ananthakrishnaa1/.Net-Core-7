@@ -44,24 +44,35 @@ builder.Services.AddSwaggerGen(options =>
     // using System.Reflection;
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
+        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.OAuth2,
-        Flows = new OpenApiOAuthFlows
-        {
-            Implicit = new OpenApiOAuthFlow
-            {
-                Scopes = new Dictionary<string, string>
-                {
-                    { "openid", "Open Id" }
-                },
-                AuthorizationUrl = new Uri(StaticConfigurationManager.AppSetting["Authentication:Domain"] + "authorize?audience=" + StaticConfigurationManager.AppSetting["Authentication:Audience"])
-            }
-        }
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+      {
+        {
+          new OpenApiSecurityScheme
+          {
+            Reference = new OpenApiReference
+              {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+              },
+              Scheme = "oauth2",
+              Name = "Bearer",
+              In = ParameterLocation.Header,
+
+            },
+            new List<string>()
+          }
+        });
 });
 builder.Services.AddAuthentication(options =>
 {
