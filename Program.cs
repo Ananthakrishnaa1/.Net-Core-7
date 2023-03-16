@@ -1,6 +1,7 @@
 using Auth0.AuthenticationApi;
 using Main.Service.Auth0.Contract;
 using Main.Service.Auth0.Repository;
+using Main.Service.MongoDB;
 using Main.Service.RabbitMQ;
 using Main.Service.Services;
 using Main.Service.Utility;
@@ -17,6 +18,7 @@ builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<IRabitMQProducer, RabitMQProducer>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthenticationConnection, HttpClientAuthenticationConnection>();
+builder.Services.AddTransient<IMongoDbService, MongoDbService>();
 
 
 //Add Htttpclient for services
