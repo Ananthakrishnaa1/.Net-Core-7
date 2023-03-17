@@ -62,5 +62,18 @@ namespace Main.Service.Auth0.Controller
             return Ok(response);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="refreshTokenRequest"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("RefteshToken")]
+        public async Task<ActionResult> RefreshToken(string refreshTokenRequest)
+        {
+            var response = await _authService.RefreshTokenAsync(refreshTokenRequest);
+            return Ok(response);
+        }
+
     }
 }

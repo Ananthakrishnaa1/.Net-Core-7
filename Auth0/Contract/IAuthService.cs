@@ -1,4 +1,5 @@
 ﻿using Main.Service.Auth0.Model;
+using System.Threading;
 
 namespace Main.Service.Auth0.Contract
 {
@@ -11,5 +12,6 @@ namespace Main.Service.Auth0.Contract
         public Task<SignInResponse> SignInAsync(SignInUserRequest signInUserRequest, CancellationToken cancellationToken = default);
         public void SignOutAsync();
         public Task<string> ChangePasswordAsync(String EmailId, CancellationToken cancellationToken = default);
+        public Task<SignInResponse> RefreshTokenAsync(string refreshTokenRequest, CancellationToken cancellationToken = default);
     }
 }

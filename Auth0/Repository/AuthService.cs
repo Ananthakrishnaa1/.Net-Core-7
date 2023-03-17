@@ -36,7 +36,8 @@ namespace Main.Service.Auth0.Repository
             BaseUri = new System.Uri(StaticConfigurationManager.AppSetting["Authentication:Domain"]);
             _maintenanceRequest.ClientId = StaticConfigurationManager.AppSetting["Authentication:ClientId"];
             _maintenanceRequest.Connection = StaticConfigurationManager.AppSetting["Authentication:DataBase"];
-            _Scope = "read";
+            // _Scope = "read";
+            _Scope = "offline_access";
             _Audience = StaticConfigurationManager.AppSetting["Authentication:Audience"];
             _SecretId = StaticConfigurationManager.AppSetting["Authentication:SecretId"];
             _httpClient = httpClient;
@@ -132,6 +133,26 @@ namespace Main.Service.Auth0.Repository
              HttpMethod.Post,
              BuildUri("dbconnections/change_password"),
              userMaintenanceRequestBase,
+             cancellationToken: cancellationToken);
+        }
+
+        public async Task<SignInResponse> RefreshTokenAsync(string refreshTokenRequest, CancellationToken cancellationToken = default)
+        {
+            if (refreshTokenRequest == null)
+                throw new ArgumentNullException(nameof(refreshTokenRequest));
+
+            RefreshTokenRequest request = new RefreshTokenRequest
+            {
+                GrantType = "refresh_token",
+                ClientId = _maintenanceRequest?.ClientId,
+                ClientSecretId = _SecretId,
+                RefereshToken = refreshTokenRequest,
+            };
+
+            return await _connections.SendAsync<SignInResponse>(
+             HttpMethod.Post,
+             BuildUri("oauth/token"),
+             request,
              cancellationToken: cancellationToken);
         }
     }
